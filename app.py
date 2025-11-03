@@ -6,10 +6,7 @@ from PIL import Image
 from io import BytesIO
 import requests
 
-# =====================================
-# CONFIGURACIÓN
-# =====================================
-# Usar ruta local: los CSV deben estar en la misma carpeta que app.py
+
 base_path = "."
 umap_file = os.path.join(base_path, "umap_dbscan_resultados.csv")
 movie_file = os.path.join(base_path, "MovieGenre.csv")
@@ -17,9 +14,7 @@ movie_file = os.path.join(base_path, "MovieGenre.csv")
 st.set_page_config(page_title="Visualizador de Películas UMAP+DBSCAN", layout="wide")
 st.title("🎬 Sistema de Recomendación Basado en Clustering Visual (UMAP + DBSCAN)")
 
-# =====================================
-# CARGAR DATOS
-# =====================================
+
 @st.cache_data
 def load_data():
     umap_df = pd.read_csv(umap_file)
@@ -33,9 +28,7 @@ def load_data():
 umap_df, movie_df = load_data()
 id_col, genre_col = "imdbId", "Genre"
 
-# =====================================
-# FILTROS
-# =====================================
+
 st.sidebar.header("🎚️ Filtros")
 genres = sorted(umap_df[genre_col].dropna().unique().tolist())
 sel_genre = st.sidebar.selectbox("Género:", ["Todos"] + genres)
@@ -49,9 +42,7 @@ if sel_genre != "Todos":
 if sel_cluster != "Todos":
     df_filtered = df_filtered[df_filtered["Cluster_DBSCAN"] == int(sel_cluster)]
 
-# =====================================
-# VISUALIZACIÓN 2D
-# =====================================
+
 st.subheader("📊 Distribución 2D de películas (UMAP + DBSCAN)")
 
 fig = px.scatter(
@@ -65,9 +56,7 @@ fig = px.scatter(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# =====================================
-# PELÍCULAS REPRESENTATIVAS DE CADA CLUSTER
-# =====================================
+
 st.subheader("🎞️ Películas representativas de cada cluster")
 
 for cl in sorted(df_filtered["Cluster_DBSCAN"].unique()):
@@ -88,9 +77,7 @@ for cl in sorted(df_filtered["Cluster_DBSCAN"].unique()):
         except Exception:
             continue
 
-# =====================================
-# RECOMENDADOR
-# =====================================
+
 st.subheader("🔍 Buscar películas por similitud visual")
 selected_id = st.selectbox("Selecciona una película (imdbId):", umap_df[id_col].unique())
 ref = umap_df.loc[umap_df[id_col] == selected_id].iloc[0]
@@ -109,9 +96,9 @@ for i, (_, row) in enumerate(similar.iterrows()):
     except Exception:
         continue
 
-# =====================================
+
 # SUBIR IMAGEN
-# =====================================
+
 st.subheader("📤 O sube una imagen para encontrar pósters similares")
 uploaded = st.file_uploader("Sube una imagen de póster (opcional)", type=["jpg", "png", "jpeg"])
 if uploaded:
